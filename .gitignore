@@ -20,6 +20,7 @@ public_models/*.pk
 *.csv
 *.gexf
 *.txt
+
 logs/
 
 # notebooks
@@ -37,5 +38,6 @@ node_modules/
 
 # frontend
 # node_modules/
+
 start.sh
 supervisord.conf
