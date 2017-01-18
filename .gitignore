@@ -1,0 +1,39 @@
+# Editor cruft
+.idea
+
+# python files [until cleared]
+*.py
+
+# Build cruft
+*.egg-info/
+.tox/
+*.pyc
+.DS_Store
+
+# Redis
+*.rdb
+
+# Model dumps
+model-requests/
+public_models/*.pk
+*-gml
+*.csv
+*.gexf
+*.txt
+logs/
+
+# notebooks
+*.ipynb
+.ipynb_checkpoints/
+notebooks/
+
+# random
+worker-ips
+node_modules/
+
+
+# private
+*.yaml
+
+# frontend
+# node_modules/

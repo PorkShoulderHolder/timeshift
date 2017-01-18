@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="static/js/foundation/foundation.js"></script>
+<script src="static/console.js"></script>
+
+<link rel="stylesheet" type="text/css" href="static/css/foundation.css">
+
+<html>
+<body>
+<style>
+    #content{
+        margin-top: 50px;
+    }
+    .items{
+        margin-bottom: 50px;;
+    }
+    .header-text{
+        background: white;;
+        border: none;;
+    }
+    .menu_button{
+        background: transparent;
+
+    }
+
+    .menu_button:hover{
+        box-shadow: 1px 2px 2px #888888;
+    }
+    .menu_button:active{
+        box-shadow: 1px 1px 2px #888888;
+    }
+
+    #new_layout{
+        width: 45px;;
+    }
+    #layout_list{
+        width: 50px;
+    }
+    #tracking_menu{
+        width: 30px;
+        margin:8px;
+    }
+    #add_id{
+        width: 30px;
+        margin:8px;
+    }
+    #merge_layouts{
+        width: 23px;;
+        margin: 10px;
+    }
+    .layouts{
+        display: none;;
+    }
+    #tracking{
+                display: none;;
+
+    }
+    #start_layout{
+                display: none;;
+
+    }
+
+    #splash{
+        display: block;;
+
+        width: 27%;
+        margin-top: auto;
+        margin-bottom: auto;;
+        margin-left: auto;
+        margin-right: auto;;
+    }
+</style>
+
+<div id="content">
+    <div class="row panel header-text" id="header">
+        <h2 class="row medium-10 columns">Timeshift Console</h2>
+
+        <div class="row medium-10 columns">
+            <img id ="layout_list" class="menu_button" src="static/img/threelines.png">
+            <img id="new_layout" class="menu_button" src="static/img/plus.png">
+            <img id="tracking_menu" class="menu_button" src="static/img/clock.png">
+            <img id="merge_layouts" class="menu_button" src="static/img/merge.png">
+
+        </div>
+ </div>
+<div >
+    <img id="splash" src="static/img/timeshift.png">
+</div>
+<div class="row panel" id="tracking">
+    <div class="medium-4 columns">
+        <div id="start_tracking" class="small button radius">Start Sequential Layouts</div>
+        <img id="add_id" class="menu_button" src="static/img/plus.png">
+    </div>
+
+    <div class="medium-8 columns ids">
+        <input  class='tracking_ids' type="text" placeholder="Search Terms"/>
+    </div>
+</div>
+
+
+
+<div class="row panel" id="start_layout">
+    <div class="medium-4 columns">
+        <div class="row">
+        <div class="small success button radius" id="begin_layout">Build Layout</div>
+            </div>
+        <div class="row">
+        <input type="radio" name="sampling_type" value="RN" id="RN" checked="checked"><label for="RN" >RN</label>
+        <input type="radio" name="sampling_type" value="RE" id="RE"><label for="RE">RE</label>
+        <input type="radio" name="sampling_type" value="RW" id="RW"><label for="RE">RW</label>
+        <input id="sample_rate_input" class="medium-1 columns" type="text" placeholder="sample rate 0.0-1.0"/>
+    </div>
+    </div>
+    <div class="medium-8 columns">
+        <input id="model_id_input" class="medium-5 columns" type="text" placeholder="model id"/>
+        <input id="name_input" class="column" type="text" placeholder="name"/>
+    </div>
+</div>
+
+
+<table class="panel row items layouts">
+<h5 class="panel row header-text layouts">Completed Layouts</h5>
+
+    <thead>
+    <tr>
+        <th width="150">Model ID</th>
+        <th width="200">Actions</th>
+        <th width="200">Select</th>
+    </tr>
+    </thead>
+    <tbody>
+
+
+    {% for model in completed_models %}
+        <tr>
+            <td><a href="visualize/{{ model }}" >{{ model }}</a></td>
+
+            <td>
+
+                <div class="tiny alert button radius" id="delete_model"
+                     onclick="if(confirm('Are you sure you would like to delete this')){
+                        $.get('api/remove_model?s3_name={{ model }}', function(resp){
+                            location.reload();
+                     })}">
+                     delete</div>
+                <div class="tiny info button radius" id="relayout" onclick="$.get('api/remove_moodel?s3_name={{ model }}',function(response){
+
+                })">relayout</div>
+            </td>
+            <td>
+                <input id="{{ model }}" type="checkbox"><label for="{{ model }}"></label>
+            </td>
+            <!--<div class="tiny secondary button radius" id="relayout" onclick="$.get('api/remove_moodel/?s3_name={{ model.name }}_{{ model.timestamp }}')">fun</div>-->
+        </tr>
+    {% endfor %}
+
+</table>
+
+<table class="panel row items layouts">
+    <h5 class="panel row header-text layouts">In Progress Layouts</h5>
+
+    <thead>
+    <tr>
+        <th width="150">Model ID</th>
+        <th width="200">Scale Model Status</th>
+        <th width="200">Timeshift Status</th>
+    </tr>
+    </thead>
+    <tbody>
+
+
+    {% for model in models %}
+        {% if model.state.graphite_state != "built" %}
+            <tr>
+                <td>{{ model.name }}</td>
+                <td>{{ model.state.sm_state }}</td>
+                <td>{{ model.state.graphite_state }}</td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+
+</table>
+</div>
+
+
+</body>
+<head>
+    <title>Console</title>
+</head>
+
+</html>
