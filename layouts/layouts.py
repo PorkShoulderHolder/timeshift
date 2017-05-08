@@ -12,6 +12,7 @@ def collapsed_layout(vertex_clustering):
     layout_collapsed.scale(450.0)
     return collapsed_graph, layout_collapsed
 
+
 def seed_layout_clusters(vertex_clustering):
     """
     perform full layout with separated modularity groups
@@ -33,6 +34,7 @@ def seed_layout_clusters(vertex_clustering):
         vertex["coordinates"] = positioned_v["coordinates"]
     return graph
 
+
 def include_cluster_centroids(func):
     """
     decorator for methods that take in a graph whose vertices have a "membership" and "coordinates" attributes
@@ -45,6 +47,7 @@ def include_cluster_centroids(func):
     def inner(graph):
         treated_graph = func(graph)
         clusters = {}
+
         for i,v in enumerate(treated_graph.vs):
             if v["membership"] in clusters.keys():
                 clusters[v["membership"]].append(v["coordinates"])
@@ -64,6 +67,7 @@ def normalize_layout(layout):
     layout.fit_into((-100,-100,-100),(100,100,100))
     layout.center((0,0,0))
     return layout
+
 
 @include_cluster_centroids
 def regular_layout(graph):

@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="content">
-                    <input id="search" type="text" placeholder="search username" />
+                    <input id="search" type="text" placeholder="search name" />
                     <div id="toggleColors" class="textbutton">
                         Color by WNF
                     </div>
@@ -107,24 +107,24 @@
         <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
         <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
         <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-        <script src="../static/WebGraphite/webgl-frameworks/three.min.js"></script>
-        <script src="../static/WebGraphite/GraphProc/gexf/build/gexf.min.js"></script>
+        <script src="../static/WebGraphite/static/webgl-frameworks/three.min.js"></script>
+        <script src="../static/WebGraphite/static/GraphProc/gexf/build/gexf.min.js"></script>
         <script src="../static/js/sweetalert.min.js"></script>
         <script src="../static/js/jquery.sidebar.min.js"></script>
         <script src="../static/js/waves.min.js"></script>
-        <script src="../static/WebGraphite/GraphProc/gexf/build/gexf.min.js"></script>
-        <script src="../static/WebGraphite/GraphProc/gexf/build/gexf.min.js"></script>
-        <script src="../static/WebGraphite/GraphProc/GraphProc.js"></script>
-        <script src="../static/WebGraphite/tween.min.js"></script>
-        <script src="../static/WebGraphite/TimeShift/SpriteSet.js"></script>
-        <script src="../static/WebGraphite/TimeShift/FunctionParser.js"></script>
-        <script src="../static/WebGraphite/TimeShift/Hud.js"></script>
-        <script src="../static/WebGraphite/TimeShift/Graphics.js"></script>
-        <script src="../static/WebGraphite/TimeShift/Cluster.js"></script>
-        <script src="../static/WebGraphite/TimeShift/GraphRenderer.js"></script>
-        <script src="../static/WebGraphite/TimeShift/Timeshift.js"></script>
+        <script src="../static/WebGraphite/static/GraphProc/gexf/build/gexf.min.js"></script>
+        <script src="../static/WebGraphite/static/GraphProc/gexf/build/gexf.min.js"></script>
+        <script src="../static/WebGraphite/static/GraphProc/GraphProc.js"></script>
+        <script src="../static/WebGraphite/static/tween.min.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/SpriteSet.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/FunctionParser.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/Hud.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/Graphics.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/Cluster.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/GraphRenderer.js"></script>
+        <script src="../static/WebGraphite/static/TimeShift/Timeshift.js"></script>
         <script src="../static/js/stats_mod.js"></script>
-        <script src="../static/WebGraphite/TrackballControls.js"></script>
+        <script src="../static/WebGraphite/static/TrackballControls.js"></script>
         <script src="../static/js/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 		<script>
@@ -146,19 +146,10 @@
             $("#loading").sidebar({side: "top", isClosed : "false"});
             $("#status").text("downloading data");
 
-            $.get('../api/get_functions?graph_id=' + model_name, function(data){
-               var functions = JSON.parse(data);
-               functions.forEach(function(f){
-                   var thumb = generateFuncThumb(f.name);
-                   thumb.click(function(){
-                      editSavedFunction(f.function);
-                   });
-                   thumb.appendTo($(".functions"));
-               });
-            });
+
             $.get('../api/json?model_file=' + model_name, function(data){
                 $("#status").text("copying to gpu");
-                var d = JSON.parse(data);
+                var d = data;
                 console.log(d)
                 if( !(Object.prototype.toString.call( d ) === '[object Array]')){
                     d = [d];
@@ -180,14 +171,8 @@
                 graphRenderer.clusterList.forEach(function(cid){
                     try{
                         var cluster = graphRenderer.clusters[cid];
-                        var phrases = cluster.meta_data.phrases[0].counts.slice(1,6).map(function(o){
-                           return o.phrase;
-                        }).sort(function(a,b){return a.count < b.count}).join(', ');
-                        var locations = cluster.meta_data.phrases[1].counts.slice(1,6).map(function(o){
-                           return o.phrase;
-                        }).sort(function(a,b){return a.count < b.count}).join(', ');
-                        var title = cluster.meta_data.id.length >= 20 ? cluster.meta_data.id.slice(0,20) + "..." : cluster.meta_data.id;
-                        var thumb = generateThumb(title, phrases, cluster.meta_data.metrics);
+
+                        var thumb = generateThumb("borg", g, "yup");
                         thumb.click(function(){
                             cluster.toggleActivation();
                         });

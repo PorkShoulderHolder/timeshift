@@ -370,7 +370,8 @@ class Graph(TemporalObject):
         self.nodes = [self.nodes[key] for key in self.nodes.keys()]
 
         self.edges = [self.edges[key] for key in self.edges.keys()]
-        json_str =  json.dumps(self.__dict__,default=lambda o: o.__dict__, sort_keys=True)
+        json_str = json.dumps(self.__dict__, default=lambda o: o.__dict__, sort_keys=True)
+
         self.nodes = nodes_copy
         self.edges = edges_copy
         return json_str

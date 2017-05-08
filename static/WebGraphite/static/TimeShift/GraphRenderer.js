@@ -10,7 +10,7 @@ GraphiteRenderer.XMLTYPE = 'xml';
 GraphiteRenderer.FULLGRAPH = 'fullgraph';
 
 GraphiteRenderer.prototype.initVars = function(camera, controls, scene, renderer){
-    this.multiplier = 1;
+    this.multiplier = 2;
     this.DEFAULT_COLORS = ["#FF6A00","#5ec8da","#FEBE10","#239dba","#36C776","#BDDC76"];
     this.NEAR = 1.5 * this.multiplier;
     this.FAR  = 4.5 * this.multiplier;
@@ -20,7 +20,7 @@ GraphiteRenderer.prototype.initVars = function(camera, controls, scene, renderer
     this.mouse.x = 0.5;
     this.mouse.y = 0.5;
     this.picsize = 0.081;
-    this.threshold = this.multiplier * 0.08;
+    this.threshold = this.multiplier * 0.32;
     this.geometries = [];
     this.clusters = {};
     this.ba = 0;
@@ -55,7 +55,6 @@ GraphiteRenderer.prototype.initVars = function(camera, controls, scene, renderer
     var geometry = new THREE.SphereGeometry( 2, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
     this.sphere = new THREE.Mesh( geometry, material );
-    this.scene.add(this.sphere);
     this.sphere.scale.multiplyScalar(0.001);
 };
 
@@ -102,15 +101,16 @@ GraphiteRenderer.prototype.separateClusters = function(scale, ms, direction){
     var fader = function(){
         self.intraclusterList.forEach(function(cid){
            var intracluster = self.intraclusters[cid];
-        if(direction != 'forward'){
-            self.scene.add(intracluster.lineMesh);
-        }
+            if(direction != 'forward'){
+                self.scene.add(intracluster.lineMesh);
+            }
            var oldOpacity = direction == 'forward' ? intracluster.defaultOpacity : 0;
            var newOpacity = direction != 'forward' ? intracluster.defaultOpacity : 0;
            var anim = intracluster.fade(ms / 4, oldOpacity, newOpacity);
            anim.onComplete(function(){
                 if(direction == 'forward'){
                     self.scene.remove(intracluster.lineMesh);
+
                 }
            }).start();
         });
@@ -127,12 +127,15 @@ GraphiteRenderer.prototype.separateClusters = function(scale, ms, direction){
             var ease = this;
             self.clusterList.forEach(function(cid){
                var cluster = self.clusters[cid];
-                if("lineMesh" in cluster && "textSprite" in cluster){
+                if("textSprite" in cluster){
                     cluster.textSprite.position.x = cluster.centroid.x * ease.textPos;
                     cluster.textSprite.position.y = cluster.centroid.y * ease.textPos;
                     cluster.textSprite.position.z = cluster.centroid.z * ease.textPos;
+                }
+                if("lineMesh" in cluster){
                     cluster.lineMesh.position.copy(new THREE.Vector3().copy(oldPositions[cluster.id]).multiplyScalar(scale * ease.t));
                     cluster.pointcloud.position.copy(new THREE.Vector3().copy(oldPositions[cluster.id]).multiplyScalar(scale * ease.t));
+
                 }
             });
         });
@@ -140,10 +143,13 @@ GraphiteRenderer.prototype.separateClusters = function(scale, ms, direction){
         fader();
         exploder.delay(ms / 5);
         exploder.start();
+        this.showClusterLabels();
     }
     else{
         exploder.onComplete(fader);
         exploder.start();
+        this.hideClusterLabels();
+
     }
 };
 
@@ -309,15 +315,7 @@ GraphiteRenderer.prototype.resolvePointsByCluster = function(){
              cluster.color = n.colors[0].map(function(c){return c / 256;});
          }
     });
-    this.graph.clusters.forEach(function(cluster_data){
-        try{
-            var cluster = self.clusters[cluster_data.id];
-            cluster.meta_data = cluster_data;
-        }
-        catch(e){
 
-        }
-    });
 };
 
 GraphiteRenderer.prototype.resolveEdgesByCluster = function(){
@@ -539,21 +537,30 @@ GraphiteRenderer.prototype.highlightUser = function(node_data){
     var coordinate = this.data_type == GraphiteRenderer.XMLTYPE ? [node_data.viz.position.x, node_data.viz.position.y, node_data.viz.position.z] : node_data.positions[0];
     coordinate = coordinate.map(function(e){ return e * self.multiplier });
 
-    var username = node_data.name;
+    var username = node_data.label;
     var text = node_data.description;
     var url = node_data.profile_image_url;
-    var handle = "@" + node_data.screen_name;
+    var handle = node_data.label;
     var location = node_data.location;
-    var info = {"img_url":url, "coords":coordinate, "user_name":username, "text":text, "handle":handle, "location":location};
-    selectThumb(info);
-    this.sphere.position.x = coordinate[0];
-    this.sphere.position.y = coordinate[1];
-    this.sphere.position.z = coordinate[2];
-    this.activateSphere(1);
+    var info = {"img_url":url, "coords":coordinate, "user_name":username, "text":"", "handle":handle, "location":""};
+
+    if(this.sphere.position.x == coordinate[0] && this.sphere.position.y == coordinate[1] && this.sphereAnimation != undefined ){
+        this.deactivateSphere();
+        this.sphereAnimation = undefined;
+    }
+    else{
+        selectThumb(info);
+        this.sphere.position.x = coordinate[0];
+        this.sphere.position.y = coordinate[1];
+        this.sphere.position.z = coordinate[2];
+        this.activateSphere(1);
+    }
 
 };
 
 GraphiteRenderer.prototype.activateSphere = function(size){
+    console.log("activating");
+    this.scene.add(this.sphere);
     var self = this;
     var rad = new THREE.Vector3(size,size,size);
     this.sphere.material.opacity = 0.5;
@@ -571,8 +578,12 @@ GraphiteRenderer.prototype.activateSphere = function(size){
 };
 
 GraphiteRenderer.prototype.deactivateSphere = function(){
-  this.sphere.material.opacity = 0;
-  this.sphereAnimation.stop();
+  console.log("deactivating");
+  if(this.sphereAnimation !== undefined){
+    this.sphere.material.opacity = 0;
+    this.sphereAnimation.stop();
+    this.scene.remove(this.sphere);
+  }
 };
 
 GraphiteRenderer.prototype.rayCast = function(ray2dLoc, threshold, objs){

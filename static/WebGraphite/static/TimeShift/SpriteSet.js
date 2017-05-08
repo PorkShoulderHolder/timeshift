@@ -47,14 +47,14 @@
                 var line1 = line_top.split(", ").slice(0,2).join(", ");
                 var line2 = line_top.split(", ").slice(2,4).join(", ");
                 context.fillStyle = "#f5f5f5";
-                context.fillText( "Phrases: " + line1, borderThickness, fontsize + borderThickness);
+                context.fillText( "" + line1, borderThickness, fontsize + borderThickness);
                 context.fillText( line2, borderThickness, fontsize + borderThickness + 130);
                 context.fillStyle = rgbToHex((color[0] * 256), (color[1] * 256) , + (color[2] * 256));
                 context.fillRect( borderThickness, fontsize + borderThickness + 220, 1700, 20);
                 context.fillStyle = "#f5f5f5";
                 var line3 = line_bottom.split(", ").slice(0,2).join(", ");
                 var line4 = line_bottom.split(", ").slice(2,4).join(", ");
-                context.fillText( "Locations: " + line3, borderThickness,  fontsize + borderThickness + 400);
+                context.fillText( "" + line3, borderThickness,  fontsize + borderThickness + 400);
                 context.fillText( line4, borderThickness,  fontsize + borderThickness + 530);
 
 

@@ -24,11 +24,16 @@ $(document).keydown(function(objEvent) {
 })
 $("#search").click(function(e){
     $("#search").focus();
-        }).keypress(function(e){
-    if(e.which === 13){
-       var id = timeShift.currentNetwork().handleDict[$("#search").val().toLowerCase()];
-       timeShift.currentNetwork().zoomToUser(id,2000);
-    }
+}).keypress(function(e){
+    var search_term = $("#search").val().toLowerCase();
+    timeShift.currentNetwork().changeColors(function(v){
+        if(v.label.toLowerCase().indexOf(search_term) != -1){
+            return [0.8, 1.0, 0.2];
+        }
+        else{
+            return [0.1, 0.1, 0.1];
+        }
+    });
 });
 
 $("#newFilter").click(function(e){
@@ -203,7 +208,7 @@ function setHudTitle(title, element){
 
 function setHudCaption(caption, location, element){
     var c = element.children(".caption")[0];
-    $(c).html(caption + " from " + location)
+    $(c).html("")
 }
 
 function setHudImage(url, element){
@@ -222,8 +227,7 @@ function selectThumb(info){
    setHudImage(info.img_url, element);
    setHudTitle(info.handle, element);
    setHudDesc(info.text, element);
-   element.toggle();
-
+   element.toggle(true);
 }
 
 function deselectThumb(){

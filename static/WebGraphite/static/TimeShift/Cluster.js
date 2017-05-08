@@ -152,25 +152,20 @@ Cluster.prototype.animateTimestep = function(){
 };
 
 Cluster.prototype.setTextSprite = function(scale, renderer, color){
-    if("meta_data" in this && "phrases" in this.meta_data){
-        var phrases = this.meta_data.phrases[0].counts.slice(1,6).map(function(o){
-           return o.phrase;
-        }).sort(function(a,b){return a.count < b.count}).join(', ');
-        var locations = this.meta_data.phrases[1].counts.slice(1,6).map(function(o){
-           return o.phrase;
-        }).sort(function(a,b){return a.count < b.count}).join(', ');
-        var params = {"fontsize": 100};
-        if( this.textSprite != undefined){
-            renderer.scene.remove(this.textSprite);
-        }
-        var spriteMaker = new SpriteSet();
-        spriteMaker.THUMBSIZE = 20;
-        this.textSprite = new SpriteSet().makeTextSprite(phrases, locations, this.centroid.x * scale, this.centroid.y * scale,
-            this.centroid.z * scale, params, color);
-        this.textSprite.material.transparent = true;
-        this.textSprite.material.opacity = 0;
-        renderer.scene.add(this.textSprite);
+
+    var phrases = renderer.graph.group_names[this.id];
+    var params = {"fontsize": 100};
+    if( this.textSprite != undefined){
+        renderer.scene.remove(this.textSprite);
     }
+    var spriteMaker = new SpriteSet();
+    spriteMaker.THUMBSIZE = 20;
+    this.textSprite = new SpriteSet().makeTextSprite(phrases, "", this.centroid.x * scale, this.centroid.y * scale,
+        this.centroid.z * scale, params, color);
+    this.textSprite.material.transparent = true;
+    this.textSprite.material.opacity = 0;
+    renderer.scene.add(this.textSprite);
+
 };
 
 Cluster.prototype.showTextSprite = function(){
