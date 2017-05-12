@@ -42,6 +42,29 @@ var TimeShift = function(data_strs, containing_element){
     this.bindMeshes();
     this.synchronizePositions(this.currentNetwork());
     this.currentNetwork().modularityColors();
+
+    this.stats.domElement.style.top = '0px';
+    this.stats.domElement.style.margin = '15px';
+    this.stats.domElement.style.position = 'absolute';
+
+    var graphRenderer = this.currentNetwork();
+    graphRenderer.clusterList.forEach(function(cid){
+        try{
+            var cluster = graphRenderer.clusters[cid];
+
+            var thumb = generateThumb("borg", g, "yup");
+            thumb.click(function(){
+                cluster.toggleActivation();
+            });
+
+            thumb.appendTo($("#clusterlist"));
+            cluster.dom = thumb;
+            cluster.setTextSprite(2, graphRenderer, cluster.color);
+        }
+        catch(e){
+            console.log(e);
+        }
+    });
 };
 
 TimeShift.prototype.currentNetwork = function(){
