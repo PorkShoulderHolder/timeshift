@@ -41,3 +41,4 @@ node_modules/
 
 start.sh
 supervisord.conf
+venv
