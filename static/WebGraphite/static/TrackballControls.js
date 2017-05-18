@@ -275,23 +275,14 @@ THREE.TrackballControls = function ( object, domElement ) {
 	}());
 
 	this.checkDistances = function () {
-
 		if ( !_this.noZoom || !_this.noPan ) {
-
 			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
-
 				_this.object.position.addVectors( _this.target, _eye.setLength( _this.maxDistance ) );
-
 			}
-
 			if ( _eye.lengthSq() < _this.minDistance * _this.minDistance ) {
-
 				_this.object.position.addVectors( _this.target, _eye.setLength( _this.minDistance ) );
-
 			}
-
 		}
-
 	};
 
 	this.update = function () {
