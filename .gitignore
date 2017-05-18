@@ -2,7 +2,7 @@
 .idea
 
 # python files [until cleared]
-*.py
+*.pyc
 
 # Build cruft
 *.egg-info/
