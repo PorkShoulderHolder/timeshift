@@ -102,7 +102,7 @@ function(node){
     }
 }
 ```
-and see the output.
+and see the colors update.
 
 ### Upcoming
 
