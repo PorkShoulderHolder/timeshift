@@ -20,18 +20,17 @@ https://arxiv.org/abs/1604.08239
 
 
 #### Javascript API
-`
+```
 var dom_obj = document.getElementById('container');
-
 var timeshift = new TimeShift(data, dom_obj);
-`
+```
 
 Where `data` is an array of json objects representing the graph and `dom_obj` is the dom element you want to append it to.
 
 The `data` variable is in a special format created by the backend, but if you look at the console output of the example, you should see what it needs to look like. For current applications `data` will be an array with a single object in it, but in the future timeshift will support dynamic graphs.
 
 The important thing is that the object(s) within `data` contain array properties called "nodes" and "edges" where a single node could look like:
-`
+```
 {
   "attributes":null,
   "colors":[
@@ -48,10 +47,10 @@ The important thing is that the object(s) within `data` contain array properties
   "timestamps":[null],
   "clusterID":"15"
 }
-`
+```
 and an edge might look like:
 
-`
+```
 {
   "attributes":null, 
   "end":null,
@@ -61,19 +60,19 @@ and an edge might look like:
   "timestamps":[null],
   "weight":null
   }
-`
+```
 The only key properties for nodes are are `colors`, `positions`, `id`, and optionally `membership` if you want to take advantage of the cluster highlighing. For edges you must have at least `source` and `target` properties which both correspond to node ids.
 
 By default node colors are set to the color from their colors property, but timeshift.js makes it easy to dynamically style nodes based on their other properties:
 
-`
+```
 timeshift.currentNetwork().changeColors(function(node){
     return [0.6, node.followers / MAX_FOLLOWERS, 0.6];
 });
-`
+```
 Above the node happens to have a float property called `followers` and we are scaling the green component by it's magnitude.
 
-`
+```
 timeshift.currentNetwork().changeColors(function(node){
     var red = [1.0, 0.2, 0.2];
     var grey = [0.4, 0.4, 0.4];
@@ -84,7 +83,7 @@ timeshift.currentNetwork().changeColors(function(node){
         return grey;
     }
 });
-`
+```
 In this example we color the node red if its label property contains the string "kissinger".
 
 #### Upcoming changes
