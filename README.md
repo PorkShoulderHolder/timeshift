@@ -88,7 +88,7 @@ timeshift.currentNetwork().changeColors(function(node){
 ```
 In this example we color the node red if its label property contains the string "kissinger".
 
-Note that in the default webapp there is a dropdown menu which allows you directly enter code of the form
+Note that in the default webapp there is a dropdown menu which allows you directly enter functions of the form
 ```
 function(node){
     var red = [1.0, 0.2, 0.2];
