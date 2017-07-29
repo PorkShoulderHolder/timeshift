@@ -15,7 +15,7 @@ https://arxiv.org/abs/1604.08239
 ```
 $python app.py marvel.graphml
 ```
-will serve the visualization on port 5000, after around 15 seconds of preprocessing
+will serve an interactive visualization on port 5000, after around 15 seconds of preprocessing
 
 
 #### Javascript API
