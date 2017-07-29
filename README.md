@@ -22,6 +22,7 @@ https://arxiv.org/abs/1604.08239
 #### Javascript API
 `
 var dom_obj = document.getElementById('container');
+
 var timeshift = new TimeShift(data, dom_obj);
 `
 
