@@ -104,7 +104,7 @@ function(node){
 ```
 and see the output.
 
-#### Upcoming
+### Upcoming
 
 I am in the process of adding support for dynamic graphs and animations between states. Further down the line I hope to include support for node sizing based on data and maybe even frontend gpgpu layout support.    
 
