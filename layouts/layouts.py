@@ -74,7 +74,7 @@ def regular_layout(graph):
     edgelist = graph.es
 
     print "totals: " + str(len(graph.vs)) + " vertices, " + str(len(edgelist)) + " edges"
-
+    print("computing layout...")
     layout = graph.layout_fruchterman_reingold_3d(maxiter=2000)
     layout = normalize_layout(layout)
 

@@ -9,6 +9,7 @@ app = Flask(__name__)
 global cluster_names
 
 file_name = "marvel.graphml"
+
 if len(sys.argv) > 1:
     file_name = sys.argv[1]
 if len(sys.argv) > 2:
@@ -57,6 +58,7 @@ def load_graphml(filename):
     with open(filename) as f:
         graph_obj = Graph.Read_GraphML(f)
         graph_obj = coerce(graph_obj)
+
         graph_obj, centroids = lo.regular_layout(graph_obj)
         gex_obj = Gex(igraph_obj=graph_obj)
         gex_obj.__dict__["group_names"] = cluster_names
@@ -76,4 +78,4 @@ def get_data():
 def render():
     return render_template("graph.html")
 
-app.run(host='0.0.0.0')
+app.run(host='0.0.0.0', port=5000)
