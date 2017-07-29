@@ -1,10 +1,7 @@
 # graphite-timeshift
 
-This is a flask based system for running a 3d graph visualization web app. The server takes a graphml file (like the example file included) as a command line argument and computes a layout using python-igraph on the backend.
+This is a flask based system for running a 3d graph visualization web app. The server takes a graphml file (like the example file included) as a command line argument and computes a layout using python-igraph on the backend. 
 ![](/timeshift_sample.png?raw=true)
-
-
-
 
 ### how it works
 This project can be used as a standalone webapp, or alternatively the constituent components can all be used on their own. A typical use-case would be to clone the app and then modify the front end for your purposes. Another use case might be to use the backend to serve data to other types of frontends, like a VR app. For example it served as the data backend for:
@@ -15,7 +12,7 @@ https://arxiv.org/abs/1604.08239
 
 #### getting started
 `
-python app.py marvel.graphml
+$python app.py marvel.graphml
 `
 will serve the visualization on port 5000, after around 15 seconds of preprocessing
 
