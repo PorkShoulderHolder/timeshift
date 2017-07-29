@@ -1,6 +1,6 @@
 # graphite-timeshift
 
-This is a flask based system for running a 3d graph visualization web app. The server takes a graphml file (like the example file included) as a command line argument and computes a layout using python-igraph on the backend. 
+This is a flask based system for running a fully interactive 3d graph visualization web app. The server takes a graphml file (like the example file included) as a command line argument and computes a layout using python-igraph on the backend. 
 ![](/timeshift_sample.png?raw=true)
 
 ### how it works
@@ -88,7 +88,22 @@ timeshift.currentNetwork().changeColors(function(node){
 ```
 In this example we color the node red if its label property contains the string "kissinger".
 
+Note that in the default webapp there is a dropdown menu which allows you directly enter code of the form
+```
+function(node){
+    var red = [1.0, 0.2, 0.2];
+    var grey = [0.4, 0.4, 0.4];
+    if(node.label.indexOf("kissinger") != -1){
+        return red;
+    }
+    else{
+        return grey;
+    }
+}
+```
+and see the output.
+
 #### Upcoming
 
-I am in the process of adding support for dynamic graphs and animations between states. Further down the line I hope to include support for node sizing based on data and maybe frontend gpgpu layout support.    
+I am in the process of adding support for dynamic graphs and animations between states. Further down the line I hope to include support for node sizing based on data and maybe even frontend gpgpu layout support.    
 
