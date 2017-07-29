@@ -28,7 +28,7 @@ var timeshift = new TimeShift(data, dom_obj);
 
 `data` is an array of json objects representing the graph and `dom_obj` is the dom element you want to append it to.
 
-The `data` variable is in a special format created by the backend, but if you look at the console output of the example, you should see what it needs to look like. For current applications `data` will be an array with a single object in it, but in the future timeshift will support dynamic graphs.
+The `data` variable is in a special format created by the backend, but if you look at the console output of the example in your browser, you should see what it needs to look like. For current applications `data` will be an array with a single object in it, but in the future timeshift will support dynamic graphs.
 
 The important thing is that the object(s) within `data` contain array properties called "nodes" and "edges" where a single node could look like:
 ```
