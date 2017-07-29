@@ -25,7 +25,9 @@ var dom_obj = document.getElementById('container');
 var timeshift = new TimeShift(data, dom_obj);
 ```
 
-Where `data` is an array of json objects representing the graph and `dom_obj` is the dom element you want to append it to.
+##### input data
+
+`data` is an array of json objects representing the graph and `dom_obj` is the dom element you want to append it to.
 
 The `data` variable is in a special format created by the backend, but if you look at the console output of the example, you should see what it needs to look like. For current applications `data` will be an array with a single object in it, but in the future timeshift will support dynamic graphs.
 
@@ -63,6 +65,8 @@ and an edge might look like:
 ```
 The only key properties for nodes are are `colors`, `positions`, `id`, and optionally `membership` if you want to take advantage of the cluster highlighing. For edges you must have at least `source` and `target` properties which both correspond to node ids.
 
+
+##### styling
 By default node colors are set to the color from their colors property, but timeshift.js makes it easy to dynamically style nodes based on their other properties:
 
 ```
@@ -86,7 +90,7 @@ timeshift.currentNetwork().changeColors(function(node){
 ```
 In this example we color the node red if its label property contains the string "kissinger".
 
-#### Upcoming changes
+#### Upcoming
 
 I am in the process of adding support for dynamic graphs and animations between states. Further down the line I hope to include support for node sizing based on data and maybe frontend gpgpu layout support.    
 
