@@ -12,9 +12,9 @@ https://arxiv.org/abs/1604.08239
 
 
 #### getting started
-`
+```
 $python app.py marvel.graphml
-`
+```
 will serve the visualization on port 5000, after around 15 seconds of preprocessing
 
 
