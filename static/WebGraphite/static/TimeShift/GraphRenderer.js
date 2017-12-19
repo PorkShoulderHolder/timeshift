@@ -502,12 +502,12 @@ GraphiteRenderer.focusToolTips = function(r, intersection){
         var coordinate = self.data_type == GraphiteRenderer.XMLTYPE ? [node_data.viz.position.x, node_data.viz.position.y, node_data.viz.position.z] : node_data.positions[0];
         coordinate = coordinate.map(function(e){ return e * self.multiplier });
 
-        var username = node_data.name;
+        var username = node_data.label;
         var text = node_data.description;
         var url = node_data.profile_image_url;
         var handle = "@" + node_data.screen_name;
         var location = node_data.location;
-        var info = {"img_url":url, "coords":coordinate, "user_name":username, "text":text, "handle":handle, "location":location};
+        var info = {"img_url":url, "coords":coordinate, "node":node_data, "location":location};
         info_dicts.push(info);
         if (info_dicts.length == 1){
             selectThumb(info);
@@ -542,7 +542,7 @@ GraphiteRenderer.prototype.highlightUser = function(node_data){
     var url = node_data.profile_image_url;
     var handle = node_data.label;
     var location = node_data.location;
-    var info = {"img_url":url, "coords":coordinate, "user_name":username, "text":"", "handle":handle, "location":""};
+    var info = {"img_url":url, "coords":coordinate, "node":node_data, "text":"", "handle":handle, "location":""};
 
     if(this.sphere.position.x == coordinate[0] && this.sphere.position.y == coordinate[1] && this.sphereAnimation != undefined ){
         this.deactivateSphere();

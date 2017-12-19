@@ -5,6 +5,7 @@ var clusterHud = $("#clusterhud");
 var userHud = $("#userhud");
 var editor = $("#editor");
 var clustersSeparate = true;
+var color_funcs = {};
  $(".sidebar.right").sidebar({side: "right"});
 editor.sidebar({side: "bottom"});
 $("#pageone").toggle();
@@ -43,6 +44,33 @@ $("#newFilter").click(function(e){
 
 $("#selectFilter").click(function(e){
     $(".functions").toggle();
+    $.get("../list_colorings", function(data){
+
+        var total_html = "";
+        data.forEach(function(name){
+            var new_html = "<div id='newFilter' class='textbutton'>" + name + "</div>"
+            total_html += new_html;
+
+        });
+        $(".functions").html(total_html);
+        data.forEach(function(name){
+            if(!(name in color_funcs)){
+                $.get("../get_coloring/" + name, function(data){
+                    color_funcs[name] = data.function_text;
+                    $(".functions." + name).click(function(){
+
+                    })
+                })
+            }
+            else{
+                $(".functions." + name).click(function(){
+
+                })
+            }
+
+        });
+    })
+
 });
 
 function editSavedFunction(funcStr){
@@ -50,6 +78,7 @@ function editSavedFunction(funcStr){
     $("#editor").trigger("sidebar:open");
     $(".editorbox").trigger("sidebar:open");
 }
+
 $("#separate").click(function(e){
     var direction = clustersSeparate ? 'forward' : 'backward';
     var time = 1400;
@@ -185,18 +214,22 @@ $("#savefunc").click(function(e){
     else{
         msg = 100 * perf.successRate + "% success rate", "Here is one type of error encountered: " + perf.failures[0];
     }
-        swal({   title: "Save this function?",
-                 text: msg,
-                 type: "warning",
-                 showCancelButton: true,
-                 confirmButtonColor: "#DD6B55",
-                 confirmButtonText: "Save",
-                 closeOnConfirm: false },
-                 function(){
-                     $.get('../api/save_function?graph_id=' + model_name + "&function=" + editor.getValue(), function(res){
-                        swal("Saved", "success");
-                     });
-             });
+    var func_str = editor.getValue();
+    var func_name = func_str.match(/(?<=var )(.*)(?=\s?=\s?function)/)[0].replace(" ", "");
+
+    swal({   title: "Save the function '" + func_name + "'?",
+             text: msg,
+             type: "warning",
+             showCancelButton: true,
+             confirmButtonColor: "#DD6B55",
+             confirmButtonText: "Save",
+             closeOnConfirm: false },
+             function(){
+                 $.post('../save_coloring', {"text": editor.getValue(), "name": func_name}, function(res){
+                    swal("Saved", "success");
+                    console.log(res);
+                 });
+         });
 
 });
 
@@ -218,15 +251,24 @@ function setHudImage(url, element){
 
 function setHudDesc(desc,element){
     var descr = element.children(".description")[0];
-    $(descr).html(desc);
+    var str_desc = "";
+    for(k in desc){
+        if(k != "img")
+            str_desc += k + ": " + desc[k].toString() + "<br>";
+    }
+    $(descr).html(str_desc);
 }
 
 function selectThumb(info){
    var element = $("#pageone");
-   setHudCaption(info.user_name, info.location, element);
-   setHudImage(info.img_url, element);
-   setHudTitle(info.handle, element);
-   setHudDesc(info.text, element);
+   // setHudCaption(info.user_name, info.location, element);
+   //
+   if("img" in info.node.attributes){
+        setHudImage(info.node.attributes.img, element);
+   }
+
+   setHudTitle(info.node.label, element);
+   setHudDesc(info.node.attributes, element);
    element.toggle(true);
 }
 

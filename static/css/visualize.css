@@ -29,7 +29,8 @@ body {
 }
 
 .profileImg{
-    margin-top: 10px;;
+    margin-top: 10px;
+    width: 195px;
 }
 
 a {
@@ -156,6 +157,11 @@ display: inline;
     color:#FF6A00;
     display: inline;
 }
+
+.description{
+    overflow: scroll;
+}
+
 #closeicon{
     width: 20px;
 }

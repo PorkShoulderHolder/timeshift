@@ -8,6 +8,7 @@ import os
 import json
 import csv
 
+
 def hex_to_rgb(value):
     """
     taken from http://stackoverflow.com/questions/214359/converting-hex-color-to-rgb-and-vice-versa
@@ -15,6 +16,7 @@ def hex_to_rgb(value):
     value = value.lstrip('#')
     lv = len(value)
     return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
 
 def rgb_to_hex(rgb):
     """
@@ -49,7 +51,7 @@ class TemporalObject(object):
 
     def consolidate_ranges(self):
         self.ranges.sort()
-        for i, (start,end) in enumerate(self.ranges):
+        for i, (start, end) in enumerate(self.ranges):
             if i + 1 < len(self.ranges):
                 next_start = self.ranges[i + 1][0]
                 next_end = self.ranges[i + 1][1]
@@ -76,10 +78,11 @@ class TemporalObject(object):
             top += 1
         return chunks
 
-class Node(TemporalObject):
-    def __init__(self, id, timestamps=None, positions=None, colors=None, label = None, attributes=None, membership=None, size=1):
 
-        super(Node,self).__init__(timestamps)
+class Node(TemporalObject):
+    def __init__(self, id, timestamps=None, positions=None, colors=None, label=None, attributes=None, membership=None,
+                 size=1):
+        super(Node, self).__init__(timestamps)
         self.id = id
         if label is None:
             self.label = self.id
@@ -116,6 +119,7 @@ class Node(TemporalObject):
         self.timestamps.insert(0,None)
         self.colors.insert(0,None)
 
+
 class Edge(TemporalObject):
     def __init__(self, source, target, timestamps=None, attributes=None, weight=None, ranges=None):
         super(Edge, self).__init__(timestamps)
@@ -130,27 +134,24 @@ class Edge(TemporalObject):
     def key(self):
         return '{0}:{1}'.format(self.source, self.target)
 
-#####################################################################################
-##   convenience methods for instantiation   ########################################
-#####################################################################################
+
+#   convenience methods for instantiation   ########################################
 
 def load_igraph(igraph_obj):
     return Graph(igraph_obj=igraph_obj)
-
-
 
 
 class Graph(TemporalObject):
     """
     Intermediary object which holds graph data. Timestamps property has no null entries
     """
-    def __init__(self, timestamps=[None], xml_string = None, igraph_obj=None, layout=None, centroids=None,
+    def __init__(self, timestamps=None, xml_string = None, igraph_obj=None, layout=None, centroids=None,
                  json_string=None, clusters=None, model_id=None):
         super(Graph, self).__init__(timestamps)
         self.nodes = {}
         self.edges = {}
         self.model_id = model_id
-        self.timestamps =timestamps
+        self.timestamps = timestamps
         self.clusters = clusters
         if centroids is not None:
             self.centroids = centroids
@@ -162,25 +163,22 @@ class Graph(TemporalObject):
         if xml_string is not None:
             self.__load_from_xml(xml_string)
 
-    def color_for_index(self,i):
+    @staticmethod
+    def color_for_index(i):
         """
         feel free to redefine this as needed
         """
         return hex_to_rgb(DEFAULT_COLORS[i % len(DEFAULT_COLORS)])
 
-
     def __load_from_xml(self, xml_string):
         root_tree = fromstring(xml_string)
         nodes_el = root_tree.find("graph").find("nodes")
         edges_el = root_tree.find("graph").find("edges")
-
         vis_namespace = {"viz":"http://www.gexf.net/1.2draft/viz"}
         get_pos_attr = lambda item: [item.attrib["x"], item.attrib["y"], item.attrib["z"]]
         get_col_attr = lambda item: [item.attrib["r"], item.attrib["g"], item.attrib["b"]]
-
         graph_timestamps = root_tree.find("graph").find("attvalues").find("timestamps").findall("timestamp")
         cluster_centroids = root_tree.find("graph").find("attvalues").findall("centroids")
-
         self.timestamps = [item.attrib["t"] for item in graph_timestamps]
 
         for node_el in nodes_el.findall('node'):
@@ -213,8 +211,8 @@ class Graph(TemporalObject):
         json_dict = json.loads(json_str)
         cp = Graph()
         for v in json_dict["nodes"]:
-            node = Node(v["id"], timestamps=v["timestamps"], colors=v["colors"],label=v["id"],
-                        attributes=v["attributes"], membership=v["membership"],positions=v["positions"])
+            node = Node(v["id"], timestamps=v["timestamps"], colors=v["colors"], label=v["id"],
+                        attributes=v["attributes"], membership=v["membership"], positions=v["positions"])
             cp.__add_node(node)
 
         for e in json_dict["edges"]:
@@ -225,11 +223,10 @@ class Graph(TemporalObject):
         self.nodes = cp.nodes
         self.edges = cp.edges
 
-
-    def __load_igraph(self,graph, timestamp = None):
+    def __load_igraph(self, graph, timestamp=None):
         if timestamp is not None:
             self.timestamps = [timestamp]
-        for n in graph.vs:
+        for i, n in enumerate(graph.vs):
             colors = None
             positions = None
             if "membership" in n.attributes():
@@ -237,14 +234,18 @@ class Graph(TemporalObject):
             if "coordinates" in n.attributes():
                 positions = [n["coordinates"]]
 
-            node = Node(n["name"], colors=colors, positions=positions, label=n["name"],
-                        timestamps=self.timestamps, membership=n["membership"])
+            label = n["label"] if "label" in n.attributes() else None
+            attributes = n["attributes"] if "attributes" in n.attributes() else None
+            node = Node(n["name"], colors=colors, positions=positions, label=label,
+                        timestamps=self.timestamps, membership=n["membership"], attributes=attributes)
             self.__add_node(node)
-        for (source,target) in graph.get_edgelist():
+
+        for (source, target) in graph.get_edgelist():
             source_name = graph.vs[source]["name"]
             target_name = graph.vs[target]["name"]
             edge = Edge(source_name, target_name, timestamps=self.timestamps)
             self.__add_edge(edge)
+        print ("totals after processing: {} vertices, {} edges".format(len(self.nodes.keys()), len(self.edges.keys())))
 
     def __load_csv_edgelist(self, fn):
         with open(fn) as f:
@@ -258,18 +259,17 @@ class Graph(TemporalObject):
                 node = Node(line[0])
                 self.__add_node(node)
 
-
     def __add_node(self, node):
         """
         attempt to concatenate with existing version of node, otherwise add a new one
         """
-        if node.__class__ != Node: raise TypeError
-        try:
-            self.nodes[node.label].positions.extend(node.positions)
-            self.nodes[node.label].timestamps.extend(node.timestamps)
-        except KeyError:
-            self.nodes[node.label] = node
 
+        if node.__class__ != Node: raise TypeError
+        if node.id in self.nodes and node.timestamps is not None:
+            self.nodes[node.id].positions.extend(node.positions)
+            self.nodes[node.id].timestamps.extend(node.timestamps)
+        else:
+            self.nodes[node.id] = node
 
     def __add_edge(self, edge):
         if edge.__class__ == Edge:
@@ -367,7 +367,16 @@ class Graph(TemporalObject):
         """
         nodes_copy = self.nodes.copy()
         edges_copy = self.edges.copy()
-        self.nodes = [self.nodes[key] for key in self.nodes.keys()]
+
+        def clean_node(node):
+            for k, v in node.attributes.iteritems():
+                # if k == "max_people":
+                #     print v, str(v)
+                if str(v) == "nan":
+                    node.attributes[k] = "null"
+            return node
+
+        self.nodes = [clean_node(self.nodes[key]) for key in self.nodes.keys()]
 
         self.edges = [self.edges[key] for key in self.edges.keys()]
         json_str = json.dumps(self.__dict__, default=lambda o: o.__dict__, sort_keys=True)
