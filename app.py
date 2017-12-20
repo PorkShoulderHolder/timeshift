@@ -22,8 +22,9 @@ def name_cluster(g, vc):
     cluster_names = {}
     for i, cluster in enumerate(vc):
         names = {}
+
         for v in cluster:
-            k = g.vs[v]['name']
+            k = v
             if k in names:
                 names[k] += g.degree(v)
             else:
@@ -33,35 +34,32 @@ def name_cluster(g, vc):
     return cluster_names
 
 
-def coerced(g):
+def coerced(g, threshold=0.02):
     global cluster_names
     to_delete = []
 
-    for i, v in enumerate(g.vs):
-        if "Modularity Class" in v.attributes():
-            v["membership"] = v["Modularity Class"]
-
     for i, e in enumerate(g.es):
-        thresh = float(sys.argv[2]) if len(sys.argv) > 2 else 0.05
-        if e['weight'] < thresh:
+        if 'weight' in e.attributes() and e['weight'] < threshold:
             to_delete.append(e.index)
+
     g.delete_edges(to_delete)
+    g.delete_vertices([v.index for v in g.vs.select(_degree_lt=1)])
     vc = g.community_multilevel(return_levels=False)
     cluster_names = name_cluster(g, vc)
     for i, cluster in enumerate(vc):
         for v in cluster:
             g.vs[v]["membership"] = i
-    #g = g.components().giant()
+
     return g
 
 
-def load_graphml(filename):
+def load_graph(filename, threshold):
     global cluster_names
     with open(filename) as f:
         print("reading {}".format(filename))
         graph_obj = Graph.Read(f)
         print("cleaning and computing modularity groups")
-        graph_obj = coerced(graph_obj)
+        graph_obj = coerced(graph_obj, threshold)
         graph_obj, centroids = lo.regular_layout(graph_obj)
         print("loading processed graph")
         gex_obj = Gex(igraph_obj=graph_obj)
@@ -70,7 +68,8 @@ def load_graphml(filename):
         json_out = gex_obj.json_dumps()
         return json_out
 
-static_json_graph = load_graphml(file_name)
+
+static_json_graph = {"default": load_graph(file_name, float(sys.argv[2]) if len(sys.argv) > 2 else 0.016)}
 
 
 @app.route("/save_coloring", methods=["POST"])
@@ -79,7 +78,7 @@ def save_coloring():
     name = request.form.get("name")
     unsafe_path = "{}/{}".format(coloring_func_dir, name)
     parent_path = os.path.abspath(coloring_func_dir)
-    if os.path.dirname( os.path.abspath(unsafe_path) ) != parent_path:
+    if os.path.dirname( os.path.abspath(unsafe_path)) != parent_path:
         return Response("bad request")
     else:
         path = os.path.abspath(unsafe_path)
@@ -113,8 +112,12 @@ def list_colorings():
 
 @app.route("/api/json")
 def get_data():
-    print "hit dis {}".format(len(static_json_graph))
-    return Response(static_json_graph, mimetype="json")
+    thresh = request.args.get("threshold")
+    if thresh is None:
+        thresh = "default"
+    elif thresh not in static_json_graph:
+        static_json_graph[thresh] = load_graph(file_name, float(thresh))
+    return Response(static_json_graph[thresh], mimetype="json")
 
 
 @app.route("/")

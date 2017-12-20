@@ -14,9 +14,7 @@ function focus(camera,x,y,z){
     var v = new THREE.Vector3(x,y,z);
     var tween = new TWEEN.Tween(camera.target).to(v, 2000);
 }
-setTimeout(function(){
-    $("#info").toggle();
-}, 20000);
+
 //
 $(document).keydown(function(objEvent) {
     if (objEvent.keyCode == 9) {  //tab pressed
@@ -47,25 +45,34 @@ $("#selectFilter").click(function(e){
     $.get("../list_colorings", function(data){
 
         var total_html = "";
+        data = JSON.parse(data);
         data.forEach(function(name){
-            var new_html = "<div id='newFilter' class='textbutton'>" + name + "</div>"
+            var new_html = "<div id='newFilter' class='function textbutton " + name + "'>" + name +
+             "<div class='edit " + name + "'>edit</div></div>"
             total_html += new_html;
-
         });
         $(".functions").html(total_html);
         data.forEach(function(name){
             if(!(name in color_funcs)){
-                $.get("../get_coloring/" + name, function(data){
-                    color_funcs[name] = data.function_text;
-                    $(".functions." + name).click(function(){
+                $.get("../get_coloring/" + name, function(d){
 
-                    })
+                    d = JSON.parse(d);
+                    color_funcs[name] = d.function_text;
+                    $(".function.textbutton." + name).click(function(){
+                        timeShift.currentNetwork().changeColors(color_funcs[name].parseFunction());
+                    });
+                    $(".edit." + name).click(function(){
+                        editSavedFunction(color_funcs[name]);
+                    });
                 })
             }
             else{
-                $(".functions." + name).click(function(){
-
-                })
+                $(".function.textbutton." + name).click(function(){
+                    timeShift.currentNetwork().changeColors(color_funcs[name].parseFunction());
+                });
+                $(".edit." + name).click(function(){
+                    editSavedFunction(color_funcs[name]);
+                });
             }
 
         });
@@ -246,6 +253,7 @@ function setHudCaption(caption, location, element){
 
 function setHudImage(url, element){
     var profileImg = element.children(".profileImg")[0];
+    $(profileImg).show();
     $(profileImg).attr("src",url);
 }
 
@@ -265,6 +273,10 @@ function selectThumb(info){
    //
    if("img" in info.node.attributes){
         setHudImage(info.node.attributes.img, element);
+   }
+   else{
+     var profileImg = element.children(".profileImg")[0];
+     $(profileImg).hide();
    }
 
    setHudTitle(info.node.label, element);

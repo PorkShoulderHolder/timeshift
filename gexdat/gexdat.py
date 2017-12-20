@@ -235,7 +235,10 @@ class Graph(TemporalObject):
                 positions = [n["coordinates"]]
 
             label = n["label"] if "label" in n.attributes() else None
-            attributes = n["attributes"] if "attributes" in n.attributes() else None
+            attributes = n["attributes"] if "attributes" in n.attributes() else {k: n[k] for k in n.attributes() if k
+                                                                                 not in ["label", "name"]}
+            if "name" not in n.attributes() or n["name"] is None:
+                n["name"] = i
             node = Node(n["name"], colors=colors, positions=positions, label=label,
                         timestamps=self.timestamps, membership=n["membership"], attributes=attributes)
             self.__add_node(node)
@@ -243,6 +246,7 @@ class Graph(TemporalObject):
         for (source, target) in graph.get_edgelist():
             source_name = graph.vs[source]["name"]
             target_name = graph.vs[target]["name"]
+
             edge = Edge(source_name, target_name, timestamps=self.timestamps)
             self.__add_edge(edge)
         print ("totals after processing: {} vertices, {} edges".format(len(self.nodes.keys()), len(self.edges.keys())))
