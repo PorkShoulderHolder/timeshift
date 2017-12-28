@@ -142,6 +142,7 @@
             Waves.attach('.button');
             Waves.init({duration:700});
             var model_name = '{{ file_name }}';
+            var threshold = '{{ threshold }}';
             var timeShift = null;
             var graphRenderer = null;
             var editor = ace.edit("editor");
@@ -151,7 +152,7 @@
             $("#status").text("downloading data");
 
 
-            $.get('../api/json?model_file=' + model_name, function(data){
+            $.get('../api/json?model_file=' + model_name + '&threshold=' + threshold, function(data){
                 $("#status").text("copying to gpu");
                 var d = data;
                 console.log(d)
