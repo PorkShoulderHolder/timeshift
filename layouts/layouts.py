@@ -44,8 +44,8 @@ def include_cluster_centroids(func):
     def cluster_hash(k,l):
         return "{0}:{1}".format(k,l)
 
-    def inner(graph):
-        treated_graph = func(graph)
+    def inner(*args, **kwargs):
+        treated_graph = func(*args, **kwargs)
         clusters = {}
 
         for i,v in enumerate(treated_graph.vs):
@@ -70,12 +70,15 @@ def normalize_layout(layout):
 
 
 @include_cluster_centroids
-def regular_layout(graph):
+def regular_layout(graph, weighted=False):
     edgelist = graph.es
 
     print "totals: " + str(len(graph.vs)) + " vertices, " + str(len(edgelist)) + " edges"
     print("computing layout...")
-    layout = graph.layout_fruchterman_reingold_3d(maxiter=2000)
+
+    w = [e["weight"] for e in graph.es] if weighted else None
+
+    layout = graph.layout_fruchterman_reingold_3d(maxiter=2000, weights=w)
     layout = normalize_layout(layout)
 
     for i,v in enumerate(graph.vs):

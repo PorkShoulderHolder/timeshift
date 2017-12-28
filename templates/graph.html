@@ -40,9 +40,11 @@
                     </div>
             </div>
                <pre id="editor">var myColor = function(node){
-        // your code here
-        // return an array like [0, 0.4, 1];
-    };</pre>
+                    // your code here
+                    // return an array like [0, 0.4, 1];
+                };
+            </pre>
+            <div class="flat-slider" id="flat-slider"></div>
             <div class="pg" id="pageone">
                         <div class="button closebutton" >
                             <img src="../static/img/cancel.svg" id="closeicon">
@@ -109,6 +111,11 @@
           integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
           crossorigin="anonymous">
         </script>
+        <script
+         src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+         crossorigin="anonymous">
+        </script>
         <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
         <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
         <script src="../static/WebGraphite/static/webgl-frameworks/three.min.js"></script>
@@ -143,6 +150,7 @@
             Waves.init({duration:700});
             var model_name = '{{ file_name }}';
             var threshold = '{{ threshold }}';
+            var weighted = '{{ weighted }}';
             var timeShift = null;
             var graphRenderer = null;
             var editor = ace.edit("editor");
@@ -152,7 +160,7 @@
             $("#status").text("downloading data");
 
 
-            $.get('../api/json?model_file=' + model_name + '&threshold=' + threshold, function(data){
+            $.get('../api/json?model_file=' + model_name + '&threshold=' + threshold + '&weighted=' + weighted, function(data){
                 $("#status").text("copying to gpu");
                 var d = data;
                 console.log(d)
@@ -169,8 +177,10 @@
 
                 document.getElementById('container').appendChild( timeShift.stats.domElement );
                 $(".sidebar.top").trigger("sidebar:toggle");
-
-
+                var slider = $('#flat-slider')
+                slider.slider({orientation: 'horizontal', range: false, value: 17, step: 0.001, min: 0, max: 0.08});
+                slider.on("slidestop", function(e, ui){document.location.href = '../?threshold=' + slider.slider("value")});
+                
                 animate();
                 function animate() {
                     TWEEN.update();
